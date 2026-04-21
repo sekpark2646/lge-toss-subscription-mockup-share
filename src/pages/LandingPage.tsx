@@ -1,5 +1,6 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import ProductGrid from '../components/ProductGrid'
 import { PRODUCT_DETAILS } from '../data/productDetails'
 import '../App.css'
 
@@ -7,6 +8,16 @@ export default function LandingPage() {
   const navigate = useNavigate()
   const [openedFaq, setOpenedFaq] = useState<number | null>(null)
   const [openedM3, setOpenedM3] = useState(false)
+  const [heroSlideIndex, setHeroSlideIndex] = useState(0)
+
+  const heroKvImages = [
+    '/kv-roll-1.png',
+    '/kv-roll-2.png',
+    '/kv-roll-3.png',
+    '/kv-roll-4.png',
+    '/kv-roll-5.png',
+    '/kv-roll-6.png',
+  ] as const
 
   const coreBenefitBadges = [
     {
@@ -74,18 +85,21 @@ export default function LandingPage() {
   const trustReviews = [
     {
       id: 'r1',
-      quote: '8년째 같은 매니저님이 관리해주셔서 더 편해요.',
-      attribution: '냉장고 구독 고객',
+      quote:
+        '8년째 같은 매니저님이 꾸준히 관리해주셔서 안심되고, 방문 시간도 정확해 생활 리듬이 전혀 깨지지 않아 정말 만족해요.',
+      customerName: '김*경',
     },
     {
       id: 'r2',
-      quote: '청약 신청하고 설치까지 빠르게 진행됐어요. 토스 결제도 편합니다.',
-      attribution: '에어컨 구독 고객',
+      quote:
+        '청약 신청부터 설치 일정 확정까지 진행이 빨랐고, 토스 결제로 매달 납부 내역을 한눈에 확인할 수 있어 관리가 훨씬 편해졌어요.',
+      customerName: '박*민',
     },
     {
       id: 'r3',
-      quote: '케어기사 방문 안내가 정확해서 부모님 댁 설치도 안심됐어요.',
-      attribution: '스타일러 구독 고객',
+      quote:
+        '케어기사 방문 안내 문자가 정확하게 와서 일정 맞추기 쉬웠고, 응대도 친절해 부모님 댁 설치까지 걱정 없이 맡길 수 있었어요.',
+      customerName: '이*진',
     },
   ] as const
 
@@ -99,6 +113,13 @@ export default function LandingPage() {
     const step = card ? card.offsetWidth + gap : el.clientWidth * 0.88
     el.scrollBy({ left: dir * step, behavior: 'smooth' })
   }
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setHeroSlideIndex((prev) => (prev + 1) % heroKvImages.length)
+    }, 2000)
+    return () => window.clearInterval(timer)
+  }, [heroKvImages.length])
 
   const faqs = [
     {
@@ -128,8 +149,8 @@ export default function LandingPage() {
       <div className="page">
         <main>
           <section className="module module-hero">
-            <nav className="hero-nav" aria-label="페이지 내비게이션">
-              <button type="button" className="hero-nav__btn" aria-label="뒤로가기">
+            <nav className="hero-nav app-header" aria-label="페이지 내비게이션">
+              <button type="button" className="hero-nav__btn app-header__icon-btn" aria-label="뒤로가기">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden>
                   <path
                     d="M15 18l-6-6 6-6"
@@ -140,7 +161,8 @@ export default function LandingPage() {
                   />
                 </svg>
               </button>
-              <button type="button" className="hero-nav__btn" aria-label="공유">
+              <p className="app-header__title">LG 가전 구독</p>
+              <button type="button" className="hero-nav__btn app-header__icon-btn" aria-label="공유">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden>
                   <circle cx="18" cy="5" r="3" stroke="currentColor" strokeWidth="2" />
                   <circle cx="6" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
@@ -154,24 +176,34 @@ export default function LandingPage() {
                 </svg>
               </button>
             </nav>
-            <p className="hero-partner-badge">TOSS × LG</p>
+            <div className="hero-partner-badge" aria-label="Toss 및 LG전자 로고">
+              <span className="hero-partner-badge__logo hero-partner-badge__logo--toss">toss</span>
+              <span className="hero-partner-badge__divider" aria-hidden>
+                ×
+              </span>
+              <span className="hero-partner-badge__logo hero-partner-badge__logo--lg">LG전자</span>
+            </div>
             <h1 className="hero-title">
               0원으로 시작하는
               <br />
               LG 가전 구독
             </h1>
-            <p className="hero-sub">
-              토스에서만,
-              <br />
-              첫 달 구독료 + 설치비 모두 0원
-            </p>
             <div className="hero-visual">
-              <div className="hero-visual__lifestyle" aria-hidden />
               <div
-                className="hero-visual__product"
-                role="img"
-                aria-label="라이프스타일 배경 위 우측 정렬 제품 누끼컷"
-              />
+                className="hero-carousel__track"
+                style={{ transform: `translateX(-${heroSlideIndex * 100}%)` }}
+              >
+                {heroKvImages.map((src, idx) => (
+                  <div key={src} className="hero-carousel__slide">
+                    <img
+                      src={src}
+                      alt={`LG 가전 구독 KV 이미지 ${idx + 1}`}
+                      loading={idx === 0 ? 'eager' : 'lazy'}
+                      decoding="async"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
             <div className="hero-scroll-hint">
               <span className="hero-scroll-hint__chevron" aria-hidden>
@@ -310,32 +342,11 @@ export default function LandingPage() {
             </div>
           </section>
 
-          <section className="module module-products" aria-labelledby="m5-title">
+          <section className="module module-products product-showcase" aria-labelledby="m5-title">
             <h2 id="m5-title" className="m5-section-title">
               구독 베스트 Top 5
             </h2>
-            <div className="m5-grid">
-              {topPopularProducts.map((p) => (
-                <article key={p.id} className="m5-card">
-                  <div className="m5-card__thumb">
-                    <img src={p.imageUrl} alt="" loading="lazy" decoding="async" />
-                  </div>
-                  <p className="m5-card__name">{p.name}</p>
-                  <p className="m5-price">
-                    <span className="m5-price__prefix">월</span>
-                    <span className="m5-price__value">{p.price}</span>
-                    <span className="m5-price__suffix">원부터</span>
-                  </p>
-                  <button
-                    type="button"
-                    className="m5-card__more"
-                    onClick={() => goProductDetail(p.id)}
-                  >
-                    더보기 &gt;
-                  </button>
-                </article>
-              ))}
-            </div>
+            <ProductGrid items={topPopularProducts} onItemClick={goProductDetail} />
             <div className="m5-best">
               <div className="m5-best__badge">
                 <span className="m5-best__star" aria-hidden>
@@ -345,7 +356,7 @@ export default function LandingPage() {
               </div>
               <div className="m5-best__row">
                 <div className="m5-best__thumb">
-                  <img src={bestProduct.imageUrl} alt="" loading="lazy" decoding="async" />
+                  <img src={bestProduct.imageUrl} alt={bestProduct.name} loading="lazy" decoding="async" />
                 </div>
                 <div className="m5-best__meta">
                   <p className="m5-best__name">{bestProduct.name}</p>
@@ -456,7 +467,7 @@ export default function LandingPage() {
                         <blockquote className="m7-trust__quote">
                           “{item.quote}”
                         </blockquote>
-                        <p className="m7-trust__attr">— {item.attribution}</p>
+                        <p className="m7-trust__attr">{item.customerName} 님의 후기</p>
                       </article>
                     ))}
                   </div>
@@ -493,9 +504,8 @@ export default function LandingPage() {
 
           <section className="module module-faq" aria-labelledby="m8-faq-title">
             <div className="m8-faq">
-              <p className="m8-faq__label">[M8 - FAQ]</p>
               <h2 id="m8-faq-title" className="m8-faq__title">
-                자주 묻는 질문
+                FAQ
               </h2>
               <div className="m8-faq__list" role="list">
                 {faqs.map((item, idx) => {
@@ -576,10 +586,11 @@ export default function LandingPage() {
 
       <aside className="sticky-bar" aria-label="하단 고정 청약 바">
         <p className="sticky-bar__price">
-          월 <strong>20,400원~</strong>
+          <span className="sticky-bar__price-label">월</span>
+          <strong>20,400원~</strong>
         </p>
-        <button type="button" className="sticky-cta">
-          청약하기 ▶
+        <button type="button" className="sticky-cta" onClick={() => goProductDetail('air')}>
+          지금 구독 신청하기
         </button>
       </aside>
     </div>

@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { PRODUCT_DETAILS } from '../data/productDetails'
 import '../App.css'
 
 type Question = {
@@ -23,28 +24,42 @@ const QUESTIONS: Question[] = [
 ]
 
 const RECOMMENDED_ITEMS = [
-  { productId: 'air', name: 'LG 퓨리케어 AI 오브제컬렉션 360˚ 공기청정기', price: '22,900', icon: '🌬️' },
-  { productId: 'fridge', name: 'LG 디오스 AI 오브제컬렉션 냉장고', price: '41,900', icon: '🧊' },
-  { productId: 'wash-tower', name: 'LG 트롬 오브제컬렉션 워시타워', price: '59,900', icon: '🧺' },
+  {
+    productId: 'air',
+    name: 'LG 퓨리케어 AI 오브제컬렉션 360˚ 공기청정기',
+    price: '22,900',
+    icon: '🌬️',
+    imageUrl: PRODUCT_DETAILS.air.imageUrl,
+  },
+  {
+    productId: 'fridge',
+    name: 'LG 디오스 AI 오브제컬렉션 냉장고',
+    price: '41,900',
+    icon: '🧊',
+    imageUrl: PRODUCT_DETAILS.fridge.imageUrl,
+  },
+  {
+    productId: 'wash-tower',
+    name: 'LG 트롬 오브제컬렉션 워시타워',
+    price: '59,900',
+    icon: '🧺',
+    imageUrl: PRODUCT_DETAILS['wash-tower'].imageUrl,
+  },
 ] as const
 
 function QuestionIllustration({ kind }: { kind: Question['imageKind'] }) {
   const scenes = {
-    kitchen: { bg: '#eaf4ff', emoji: '💧', title: '주방 정수기 주변', sub: '출수구·물받이 위생 확인' },
-    laundry: { bg: '#f3edff', emoji: '🧺', title: '세탁기/건조기 내부', sub: '냄새와 습기 잔존 체크' },
-    air: { bg: '#e9fbf6', emoji: '🌬️', title: '아이방 공기 상태', sub: '답답함·먼지 민감도 점검' },
-    fridge: { bg: '#eef7f2', emoji: '🧊', title: '냉장고 내부 청결', sub: '냄새/오염 사각지대 확인' },
-    general: { bg: '#fff4ec', emoji: '🏠', title: '우리집 가전 위생', sub: '일상 관리 부담도 체크' },
+    kitchen: { emoji: '💧', title: '우리집 가전 위생' },
+    laundry: { emoji: '🧺', title: '우리집 가전 위생' },
+    air: { emoji: '🌬️', title: '우리집 가전 위생' },
+    fridge: { emoji: '🧊', title: '우리집 가전 위생' },
+    general: { emoji: '🏠', title: '우리집 가전 위생' },
   }[kind]
 
   return (
-    <div className="mission-illust" style={{ background: scenes.bg }} role="img" aria-label={scenes.title}>
-      <div className="mission-illust__emoji" aria-hidden>
-        {scenes.emoji}
-      </div>
-      <p className="mission-illust__title">{scenes.title}</p>
-      <p className="mission-illust__sub">{scenes.sub}</p>
-    </div>
+    <p className="mission-category-badge">
+      {scenes.emoji} {scenes.title}
+    </p>
   )
 }
 
@@ -84,63 +99,82 @@ export default function HygieneMissionPage() {
     })
   }
 
-  const onNext = () => {
-    if (selected === null) return
-    if (currentIndex === QUESTIONS.length - 1) return setView('result')
-    setCurrentIndex((p) => p + 1)
-  }
+  useEffect(() => {
+    if (view !== 'quiz' || selected === null) return
+    const timer = window.setTimeout(() => {
+      if (currentIndex === QUESTIONS.length - 1) {
+        setView('result')
+      } else {
+        setCurrentIndex((p) => p + 1)
+      }
+    }, 150)
+    return () => window.clearTimeout(timer)
+  }, [selected, currentIndex, view])
 
   return (
     <div className="mission-page-wrap">
       <div className="mission-page">
-        <header className="mission-nav">
-          <button type="button" className="mission-nav__back" onClick={() => navigate(-1)} aria-label="뒤로가기">
+        <header className="mission-nav app-header">
+          <button
+            type="button"
+            className="mission-nav__back app-header__icon-btn"
+            onClick={() => navigate(-1)}
+            aria-label="뒤로가기"
+          >
             ←
           </button>
-          <p>우리집 위생관심 지수</p>
+          <p className="app-header__title">우리집 위생관심 지수</p>
+          <button
+            type="button"
+            className="mission-nav__back app-header__icon-btn"
+            onClick={() => navigate('/')}
+            aria-label="닫기"
+          >
+            ✕
+          </button>
         </header>
 
         {view === 'quiz' && (
-          <main className="mission-card">
-            <p className="mission-step-label">[Step 3 - 체크리스트]</p>
-            <div className="mission-progress">
-              <div className="mission-dots" aria-hidden>
-                {QUESTIONS.map((_, idx) => (
-                  <span key={idx} className={idx <= currentIndex ? 'is-on' : ''} />
-                ))}
+          <>
+            <div className="mission-progress-wrap">
+              <div className="mission-progress">
+                <p className="mission-q-count">
+                  {currentIndex + 1} / 10
+                </p>
+            </div>
+              <div className="mission-progress-bar" aria-hidden>
+                <span style={{ width: `${progressPercent}%` }} />
               </div>
-              <p className="mission-q-count">
-                Q <strong>{currentIndex + 1}/10</strong>
-              </p>
-            </div>
-            <div className="mission-progress-bar" aria-hidden>
-              <span style={{ width: `${progressPercent}%` }} />
             </div>
 
-            <QuestionIllustration kind={current.imageKind} />
-            <p className="mission-question">{current.text}</p>
+            <main className="mission-quiz-content">
+              <QuestionIllustration kind={current.imageKind} />
+              <p className="mission-question">{current.text}</p>
 
-            <div className="mission-options">
-              <button
-                type="button"
-                className={`mission-option ${selected === true ? 'is-selected' : ''}`}
-                onClick={() => setAnswer(true)}
-              >
-                Yes, 그런 적 있어요
-              </button>
-              <button
-                type="button"
-                className={`mission-option mission-option--muted ${selected === false ? 'is-selected' : ''}`}
-                onClick={() => setAnswer(false)}
-              >
-                No, 해당 없어요
-              </button>
-            </div>
-
-            <button type="button" className="mission-next" onClick={onNext} disabled={selected === null}>
-              다음 ▶
-            </button>
-          </main>
+              <div className="mission-options">
+                <button
+                  type="button"
+                  className={`mission-option ${selected === true ? 'is-selected' : ''}`}
+                  onClick={() => setAnswer(true)}
+                >
+                  <span className="mission-option__check" aria-hidden>
+                    {selected === true ? '✓' : ''}
+                  </span>
+                  <span>네, 자주 신경 쓰여요</span>
+                </button>
+                <button
+                  type="button"
+                  className={`mission-option mission-option--muted ${selected === false ? 'is-selected' : ''}`}
+                  onClick={() => setAnswer(false)}
+                >
+                  <span className="mission-option__check" aria-hidden>
+                    {selected === false ? '✓' : ''}
+                  </span>
+                  <span>아니요, 괜찮아요</span>
+                </button>
+              </div>
+            </main>
+          </>
         )}
 
         {view === 'result' && (
@@ -173,7 +207,7 @@ export default function HygieneMissionPage() {
         )}
 
         {view === 'bundle' && (
-          <main className="mission-card">
+          <main className="mission-card mission-card--bundle">
             <p className="mission-step-label">[Step 7 - 맞춤 추천 CTA]</p>
             <p className="mission-bundle-copy">당신의 관리 유형에 맞는 추천 제품</p>
 
@@ -185,8 +219,14 @@ export default function HygieneMissionPage() {
                   className="mission-bundle-item"
                   onClick={() => navigate(`/product/${item.productId}`)}
                 >
+                  <div className="mission-bundle-item__thumb">
+                    <img src={item.imageUrl} alt={item.name} loading="lazy" decoding="async" />
+                  </div>
                   <p className="mission-bundle-item__name">
-                    <span aria-hidden>{item.icon}</span> {item.name}
+                    <span className="mission-bundle-item__icon" aria-hidden>
+                      {item.icon}
+                    </span>{' '}
+                    {item.name}
                   </p>
                   <p className="mission-bundle-item__price">
                     월 <strong>₩{item.price}</strong> / 케어 포함
