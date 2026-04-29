@@ -198,7 +198,11 @@ export default function ProductDetailPage() {
       </main>
 
       <aside className="pd-fixed-cta" aria-label="하단 고정 청약 영역">
-        <button type="button" className="pd-fixed-cta__primary">
+        <button
+          type="button"
+          className="pd-fixed-cta__primary"
+          onClick={() => navigate('/subscribe/flow/0')}
+        >
           구독 신청하기
         </button>
         <p className="pd-fixed-cta__info">📨 신청 시 카카오 알림톡으로 링크가 전송돼요</p>

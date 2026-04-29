@@ -9,6 +9,7 @@ export default function LandingPage() {
   const [openedFaq, setOpenedFaq] = useState<number | null>(null)
   const [openedM3, setOpenedM3] = useState(false)
   const [heroSlideIndex, setHeroSlideIndex] = useState(0)
+  const [openedPressId, setOpenedPressId] = useState<string | null>(null)
 
   const heroKvImages = [
     '/kv-roll-1.png',
@@ -37,26 +38,12 @@ export default function LandingPage() {
     },
   ]
 
-  const missionEntries = [
-    {
-      id: 'hygiene',
-      bg: '#eef4ff',
-      title: '우리집 위생관심 지수',
-      detail: '60초 · 10Q',
-      reward: '시작하기',
-      icon: 'droplet' as const,
-    },
-    {
-      id: 'care',
-      bg: '#f5eeff',
-      title: '케어중독 테스트',
-      detail: '45초 · 10Q',
-      reward: '시작하기',
-      icon: 'heart' as const,
-    },
-  ]
+  const hygieneMission = {
+    detail: '나에게 딱 맞는 구독제품은?',
+    reward: '시작하기',
+  } as const
 
-  const topPopularIds = ['aircon', 'styler', 'fridge', 'air'] as const
+  const topPopularIds = ['wash-tower', 'styler', 'fridge', 'air'] as const
   const topPopularProducts = topPopularIds.map((id) => {
     const d = PRODUCT_DETAILS[id]
     return {
@@ -67,9 +54,9 @@ export default function LandingPage() {
     }
   })
 
-  const bestDetail = PRODUCT_DETAILS['wash-tower']
+  const bestDetail = PRODUCT_DETAILS['aircon']
   const bestProduct = {
-    id: 'wash-tower' as const,
+    id: 'aircon' as const,
     name: bestDetail.fullName,
     price: bestDetail.monthly,
     imageUrl: bestDetail.imageUrl,
@@ -103,7 +90,54 @@ export default function LandingPage() {
     },
   ] as const
 
-  const pressOutlets = ['한경', '매경', '조선', '중앙'] as const
+  const pressArticles = [
+    {
+      id: 'asia',
+      outlet: '아시아경제',
+      headline: "[언박싱] 집안일 줄여주는 진짜 '이모님'…LG 가전 케어 구독 써보니",
+      summary: [
+        "기자가 직접 체험한 케어서비스에서 '2인 1조' 매니저가 방문해 분해·세척·스팀·살균을 체계적으로 진행했다고 소개합니다.",
+        '에어컨 내부 토출구·팬·드레인판 등 셀프 청소가 어려운 영역까지 관리해 냄새와 위생 개선 체감이 컸다고 전합니다.',
+        '제품 점검, 소모품 교체, 무상 A/S 등 통합 관리형 소비 수요가 커지고 있으며 LG 구독 케어가 이를 지원한다고 정리합니다.',
+      ],
+      sourceUrl: 'https://n.news.naver.com/mnews/article/277/0005744763?sid=101',
+    },
+    {
+      id: 'etnews',
+      outlet: '전자신문',
+      headline: '[디지털라이프] 9년 만의 첫 에어컨 분해 청소…LG 구독 케어 받아보니',
+      summary: [
+        '9년 사용한 에어컨을 분해했을 때 내부 오염이 확인됐고, 전문 매니저의 고압 세척·건조·UV 살균으로 개선됐다고 설명합니다.',
+        '프리미엄/라이트플러스 등 상품별 케어 범위 차이를 함께 안내하며, 분해 세척의 필요성을 강조합니다.',
+        '정기 전문 케어가 제품 성능 유지와 위생 관리에 실질적으로 도움이 됐다는 체험 관점을 전달합니다.',
+      ],
+      sourceUrl: 'https://n.news.naver.com/mnews/article/030/0003394429?sid=105',
+    },
+    {
+      id: 'joongang',
+      outlet: '중앙일보',
+      headline: "매일 닦아도 오염물질 찌든 우리집, 범인은 '가전 내부'에 있었다",
+      summary: [
+        '겉으로는 깨끗해 보여도 가전 내부 곰팡이·먼지 오염이 누적될 수 있고, 실내 공기/피부 건강에 영향을 줄 수 있다고 설명합니다.',
+        "전문가 인터뷰를 통해 '분해 청소+정기 점검'의 필요성을 제시하고, 특히 알레르기·호흡기 민감군의 관리 중요성을 강조합니다.",
+        'LG 구독 전문케어를 사례로 가전별 맞춤 관리(세척·살균·점검·소모품 교체) 흐름을 소개합니다.',
+      ],
+      sourceUrl: 'https://www.joongang.co.kr/article/25400191',
+    },
+    {
+      id: 'jhealth',
+      outlet: '헬스중앙',
+      headline: '실내로 퍼지는 가전 내부 오염…전문가 케어로 관리해야',
+      summary: [
+        '환기가 줄어드는 계절에는 실내 오염 노출이 늘고, 내부 청소가 어려운 가전이 오염 확산의 원인이 될 수 있다고 짚습니다.',
+        '세탁기·에어컨·공기청정기 등은 구조상 습기와 오염이 쌓이기 쉬워 분해 기반 전문 관리가 현실적 대안으로 제시됩니다.',
+        'LG 구독 전문케어의 정기 방문 관리(클리닝·살균·점검·필터 교체)가 소비자 관리 부담을 줄인다고 정리합니다.',
+      ],
+      sourceUrl: 'https://jhealthmedia.joins.com/news/articleView.html?idxno=31853',
+    },
+  ] as const
+
+  const openedPressArticle = pressArticles.find((item) => item.id === openedPressId) ?? null
 
   const scrollTrustReviews = (dir: -1 | 1) => {
     const el = trustReviewsCarouselRef.current
@@ -184,9 +218,7 @@ export default function LandingPage() {
               <span className="hero-partner-badge__logo hero-partner-badge__logo--lg">LG전자</span>
             </div>
             <h1 className="hero-title">
-              0원으로 시작하는
-              <br />
-              LG 가전 구독
+              0원으로 시작하는 LG 가전 구독
             </h1>
             <div className="hero-visual">
               <div
@@ -253,19 +285,16 @@ export default function LandingPage() {
           <section className="module module-toss-banner" aria-label="토스 전용 혜택">
             <div className="m3-banner__inner">
               <p className="m3-banner__label">
-                <span className="m3-banner__gift" role="img" aria-label="선물">
-                  🎁
-                </span>
                 <span>토스에서만</span>
               </p>
               <p className="m3-banner__headline">
-                첫 <span className="m3-banner__accent">3개월</span> 구독료
+                토스고객 한정 특별 혜택,
                 <br />
-                최대 <span className="m3-banner__accent">50%</span> 할인
+                첫 <span className="m3-banner__accent">3개월</span> 구독료 <span className="m3-banner__accent">0원!</span>
               </p>
               <p className="m3-banner__sub">
                 <span className="m3-banner__accent">+</span> 토스머니 최대{' '}
-                <span className="m3-banner__accent">₩10,000</span> 캐시백
+                <span className="m3-banner__accent">3만원</span> 캐시백
               </p>
               <button
                 type="button"
@@ -282,8 +311,8 @@ export default function LandingPage() {
               {openedM3 && (
                 <div id="m3-benefit-detail" className="m3-banner__detail" role="region" aria-label="혜택 상세 안내">
                   <ul>
-                    <li>첫 3개월 동안 월 구독료 최대 50% 할인 (상품별 상이)</li>
-                    <li>토스 결제 시 토스머니 최대 10,000원 캐시백 제공</li>
+                    <li>토스 고객 한정으로 첫 3개월 구독료 0원 혜택 제공 (상품/조건별 상이)</li>
+                    <li>토스 결제 시 토스머니 최대 3만원 캐시백 제공</li>
                     <li>청약 완료 고객 대상 설치 우선 배정 및 알림톡 안내</li>
                   </ul>
                 </div>
@@ -294,60 +323,25 @@ export default function LandingPage() {
           <section className="module module-mission" aria-labelledby="m4-title">
             <header className="m4-heading">
               <h2 id="m4-title" className="m4-title">
-                나에게 맞는 구독 찾고 포인트 받기
+                나의 위생관리 지수를 테스트 해보세요
               </h2>
-              <p className="m4-subtitle">60초면 충분해요</p>
             </header>
-            <div className="m4-grid">
-              {missionEntries.map((mission) => (
-                <button
-                  key={mission.id}
-                  type="button"
-                  className={`m4-card m4-card--${mission.id}`}
-                  style={{ backgroundColor: mission.bg }}
-                  onClick={() => {
-                    if (mission.id === 'hygiene') navigate('/mission/hygiene')
-                  }}
-                >
-                  <span className="m4-card__icon" aria-hidden>
-                    {mission.icon === 'droplet' ? (
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path
-                          d="M12 2.69l5.66 5.66a8 8 0 11-11.32 0L12 2.69z"
-                          stroke="#ec4899"
-                          strokeWidth="1.75"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    ) : (
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path
-                          d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-                          stroke="#3182f6"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    )}
-                  </span>
-                  <div className="m4-card__body">
-                    <p className="m4-card__title">{mission.title}</p>
-                    <p className="m4-card__detail">{mission.detail}</p>
-                  </div>
-                  <span className="m4-card__reward">{mission.reward}</span>
-                </button>
-              ))}
-            </div>
+            <button type="button" className="m4-inline-cta" onClick={() => navigate('/mission/hygiene')}>
+              <span className="m4-inline-cta__text">{hygieneMission.detail}</span>
+              <span className="m4-inline-cta__reward">{hygieneMission.reward}</span>
+            </button>
           </section>
 
           <section className="module module-products product-showcase" aria-labelledby="m5-title">
             <h2 id="m5-title" className="m5-section-title">
               구독 베스트 Top 5
             </h2>
-            <ProductGrid items={topPopularProducts} onItemClick={goProductDetail} />
-            <div className="m5-best">
+            <button
+              type="button"
+              className="m5-best"
+              onClick={() => goProductDetail(bestProduct.id)}
+              aria-label={`${bestProduct.name} 상품 상세 보기`}
+            >
               <div className="m5-best__badge">
                 <span className="m5-best__star" aria-hidden>
                   ★
@@ -368,65 +362,8 @@ export default function LandingPage() {
                   <p className="m5-best__tag">{bestProduct.tag}</p>
                 </div>
               </div>
-              <button
-                type="button"
-                className="m5-best__more"
-                onClick={() => goProductDetail(bestProduct.id)}
-              >
-                더보기 &gt;
-              </button>
-            </div>
-          </section>
-
-          <section className="module module-coupon" aria-labelledby="m6-coupon-title">
-            <div className="m6-coupon">
-              <div className="m6-coupon__sparkle" aria-hidden />
-              <div className="m6-coupon__inner">
-                <div className="m6-coupon__head">
-                  <span className="m6-coupon__lock" aria-hidden>
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M7 11V8a5 5 0 0110 0v3"
-                        stroke="#facc15"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                      />
-                      <rect
-                        x="5"
-                        y="11"
-                        width="14"
-                        height="11"
-                        rx="2"
-                        stroke="#facc15"
-                        strokeWidth="2"
-                      />
-                      <circle cx="12" cy="16" r="1.5" fill="#facc15" />
-                    </svg>
-                  </span>
-                  <h2 id="m6-coupon-title" className="m6-coupon__title">
-                    내 신용점수로 숨은 혜택 열기
-                  </h2>
-                </div>
-                <ul className="m6-coupon__hints">
-                  <li>
-                    <span className="m6-coupon__accent">800점 이상</span>
-                    <span className="m6-coupon__hint-muted"> · 3개월 </span>
-                    <span className="m6-coupon__accent">50%</span>
-                  </li>
-                  <li>
-                    <span className="m6-coupon__accent">700~799점</span>
-                    <span className="m6-coupon__hint-muted"> · 첫 달 무료</span>
-                  </li>
-                  <li>
-                    <span className="m6-coupon__hint-muted">그 외 · 설치비 면제</span>
-                  </li>
-                </ul>
-                <button type="button" className="m6-coupon__cta">
-                  [ 1초 만에 확인하기 ▶ ]
-                </button>
-                <p className="m6-coupon__note">※ 신용조회 이력이 남지 않아요</p>
-              </div>
-            </div>
+            </button>
+            <ProductGrid items={topPopularProducts} onItemClick={goProductDetail} />
           </section>
 
           <section className="module module-trust" aria-label="신뢰 요소">
@@ -434,7 +371,7 @@ export default function LandingPage() {
               <div className="m7-trust__block m7-trust__block--stat">
                 <p className="m7-trust__stat">
                   누적 구독 고객{' '}
-                  <strong className="m7-trust__stat-num">325만 세대</strong>
+                  <strong className="m7-trust__stat-num">270만 계정</strong>
                 </p>
               </div>
 
@@ -492,15 +429,50 @@ export default function LandingPage() {
                   언론에서 주목한 LG 가전구독
                 </p>
                 <ul className="m7-trust__logos" aria-label="언론사 로고">
-                  {pressOutlets.map((name) => (
-                    <li key={name} className="m7-trust__logo">
-                      {name}
+                  {pressArticles.map((item) => (
+                    <li key={item.id}>
+                      <button
+                        type="button"
+                        className="m7-trust__logo"
+                        onClick={() => setOpenedPressId(item.id)}
+                        aria-label={`${item.outlet} 기사 요약 보기`}
+                      >
+                        {item.outlet}
+                      </button>
                     </li>
                   ))}
                 </ul>
               </div>
             </div>
           </section>
+
+          {openedPressArticle && (
+            <div className="press-modal" role="dialog" aria-modal="true" aria-labelledby="press-modal-title">
+              <div className="press-modal__backdrop" onClick={() => setOpenedPressId(null)} aria-hidden />
+              <div className="press-modal__content">
+                <p className="press-modal__outlet">{openedPressArticle.outlet}</p>
+                <h3 id="press-modal-title" className="press-modal__title">
+                  {openedPressArticle.headline}
+                </h3>
+                <ul className="press-modal__summary">
+                  {openedPressArticle.summary.map((line) => (
+                    <li key={line}>{line}</li>
+                  ))}
+                </ul>
+                <a
+                  className="press-modal__link"
+                  href={openedPressArticle.sourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  원문 보기
+                </a>
+                <button type="button" className="press-modal__close" onClick={() => setOpenedPressId(null)}>
+                  닫기
+                </button>
+              </div>
+            </div>
+          )}
 
           <section className="module module-faq" aria-labelledby="m8-faq-title">
             <div className="m8-faq">
@@ -565,34 +537,9 @@ export default function LandingPage() {
             </div>
           </section>
 
-          <section className="module module-final" aria-labelledby="m9-final-title">
-            <div className="m9-final">
-              <p id="m9-final-title" className="m9-final__copy">
-                오늘의 가전, 오늘 바로
-              </p>
-              <button type="button" className="m9-final__mega-cta">
-                <span className="m9-final__mega-cta-accent">0원</span>으로 구독 시작하기 ▶
-              </button>
-              <button type="button" className="m9-final__sub-cta">
-                10초 설문 참여하고 선물 받기
-              </button>
-              <button type="button" className="m9-final__sub-cta">
-                전화 상담 받기
-              </button>
-            </div>
-          </section>
         </main>
       </div>
 
-      <aside className="sticky-bar" aria-label="하단 고정 청약 바">
-        <p className="sticky-bar__price">
-          <span className="sticky-bar__price-label">월</span>
-          <strong>20,400원~</strong>
-        </p>
-        <button type="button" className="sticky-cta" onClick={() => goProductDetail('air')}>
-          지금 구독 신청하기
-        </button>
-      </aside>
     </div>
   )
 }
